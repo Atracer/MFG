@@ -7,8 +7,8 @@ import os
 
 methods = {
     "MFG": "results_d0_1_bench/avg_reputation.npy",
-    "Stackelberg": "results_stackelberg/avg_reputation_stackelberg.npy",
-    "Auction": "results_auction/avg_reputation.npy",
+    "Stackelberg": "results_stackelberg_fpk_b3_1/avg_reputation_stackelberg.npy",
+    "Auction": "results_auction_fpk_b3_1/avg_reputation.npy",
 }
 
 plt.figure(figsize=(8, 5))

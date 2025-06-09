@@ -31,7 +31,7 @@ delta[:, :, 0] = settings.init_delta.copy()
 control = np.zeros((pop, rep_grid.size(), T + 1))
 reward_seq = np.zeros(T + 1)
 avg_reputation = np.zeros(T + 1)
-
+ 
 # cost function
 def compute_cost(rep_idx):
     rep = rep_idx * rep_grid.dx

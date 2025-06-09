@@ -12,7 +12,7 @@ a3 = 1  # weight of gain
 '''Dynamic fi parameters'''
 beta1 = 2  # weight of pop influence: benchmark: 2 -> 5 not much difference
 beta2 = 1  # weight of current state: 1 -> 2 -> 0.5: huge different!!!!
-beta3 = 3  # weight of data quality: 1 -> 3 -> 0.1: huge different!!!!
+beta3 = 0.1  # weight of data quality: 1 -> 3 -> 0.1: huge different!!!!
 d0 = 1  # average data quality: 1 -> 5 : huge different!!!!
 beta4 = 2  # weight of reward: 2 -> 1 -> 4:  huge different!!!!
 

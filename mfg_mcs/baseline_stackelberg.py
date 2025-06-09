@@ -12,7 +12,7 @@ pop = settings.pop + 1               # 种群数量
 T = settings.time_steps              # 总时间步数
 n_states = rep_grid.n
 
-output_dir = "results_stackelberg_fpk_b3_3"
+output_dir = "results_stackelberg_fpk_b3_0.1_june_8"
 os.makedirs(output_dir, exist_ok=True)
 
 # parameters
@@ -92,12 +92,8 @@ for t in range(T):
     avg_reputation[t] = R
     collective_quality[t] = D
 
-    # —— 领导者动态更新奖励 (离散形式) —— 
-    # 按论文 Eq.(6)：d r = [ω1 (P - D) r + ω2 R] dt
-    # 这里简单假设 P = d0 * pop（领导者期望每个种群都达到平均质量 d0）
-    P = d0 * pop
-    reward += dt * (omega1 * (P - D) * reward + omega2 * R)
-    # 避免奖励变为负数
+    # —— 领导者动态更新奖励 —— 
+    reward += dt * (omega2 * R - omega1 * D)
     reward = max(0.0, reward)
 
 # 保存最后一步的奖励与其他指标
@@ -134,3 +130,4 @@ np.save(f"{output_dir}/delta.npy",  delta)
 np.save(f"{output_dir}/reward.npy",  reward_seq)
 np.save(f"{output_dir}/avg_reputation_stackelberg.npy", avg_reputation)
 print("[Stackelberg] Simulation completed.")
+print("[DEBUG] delta shape:", delta.shape)

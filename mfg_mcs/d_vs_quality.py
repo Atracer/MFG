@@ -8,8 +8,8 @@ stackelberg_path = "results_stackelberg_fpk_b3_1"
 auction_path = "results_auction_fpk_b3_1"
 
 # # 加载原始方法数据（含 reward index）
-# control_orig = np.load(f"{orig_path}/control.npy")  # shape: (G_n+1, pop, n_states, T+1)
-# delta_orig = np.load(f"{orig_path}/delta.npy")
+control_orig = np.load(f"{orig_path}/control.npy")  # shape: (G_n+1, pop, n_states, T+1)
+delta_orig = np.load(f"{orig_path}/delta.npy")
 
 # 加载 Baseline: Stackelberg
 control_stack = np.load(f"{stackelberg_path}/control.npy")  # shape: (pop, n_states, T+1)
@@ -40,9 +40,9 @@ def compute_avg_u(control, delta, t):
 
 # 原方法使用 reward_idx=10
 reward_idx = 20
-# control_o = control_orig[reward_idx]  # shape: (pop, n_states, T+1)
-# delta_o = delta_orig[reward_idx]
-# u_orig = compute_avg_u(control_o, delta_o, time_to_plot)
+control_o = control_orig[reward_idx]  # shape: (pop, n_states, T+1)
+delta_o = delta_orig[reward_idx]
+u_orig = compute_avg_u(control_o, delta_o, time_to_plot)
 
 # Baselines
 u_stack = compute_avg_u(control_stack, delta_stack, time_to_plot)
@@ -50,7 +50,7 @@ u_auction = compute_avg_u(control_auction, delta_auction, time_to_plot)
 
 # 绘图
 plt.figure(figsize=(8, 5))
-# plt.plot(rep_values, u_orig, label="Original", marker='o')
+plt.plot(rep_values, u_orig, label="Original", marker='o')
 plt.plot(rep_values, u_stack, label="Stackelberg", marker='s')
 plt.plot(rep_values, u_auction, label="Auction", marker='^')
 

@@ -9,7 +9,7 @@ from scipy.stats import gaussian_kde
 
 method_dirs = {
     "main": "results_b3_{b3}",
-    "stackelberg": "results_stackelberg_fpk_b3_{b3}",
+    "stackelberg": "results_stackelberg_fpk_b3_{b3}_june_8",
     # "stk":"results_stackelberg_fpk_b3_{b3}",
     "auction": "results_auction_fpk_b3_{b3}"
 }
@@ -44,6 +44,8 @@ for b3 in beta3_values:
             continue
 
         delta = np.load(delta_path)
+        print(f"[DEBUG] {method}: delta shape = {delta.shape}")
+        print(f"[DEBUG] {method}: delta[:, :, -1] sum = {np.sum(delta[:, :, -1])}")
 
         # === 获取最终时刻 delta ===
         if delta.ndim == 3:
@@ -54,7 +56,7 @@ for b3 in beta3_values:
         elif delta.ndim == 4:
             # shape: (reward_idx, pop, rep, time)
             delta_final = delta[10, :, :, -1].sum(axis=0)
-            print(f"[DEBUG] {method} max delta_final = {np.max(delta_final):.4f}, sum = {np.sum(delta_final):.4f}")
+            # print(f"[DEBUG] {method} max delta_final = {np.max(delta_final):.4f}, sum = {np.sum(delta_final):.4f}")
         else:
             raise ValueError(f"Unsupported delta shape: {delta.shape}")
 
@@ -71,7 +73,7 @@ for b3 in beta3_values:
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    out_name = f"compare_pdf_fpk_b3{b3}_d0{d0}_new.png"
+    out_name = f"compare_pdf_fpk_b3{b3}_d0{d0}_june_8.png"
     plt.savefig(out_name, dpi=300)
     print(f"[✓] Saved: {out_name}")
     plt.close()
