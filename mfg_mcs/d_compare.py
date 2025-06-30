@@ -9,7 +9,7 @@ from scipy.stats import gaussian_kde
 
 method_dirs = {
     "main": "results_d0_{d0}",
-    "stackelberg": "results_stackelberg_fpk_d0_{d0}",
+    "stackelberg": "results_stackelberg_fpk_revised_d0_{d0}",
     "auction": "results_auction_fpk_d0_{d0}"
 }
 
