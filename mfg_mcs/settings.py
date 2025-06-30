@@ -180,4 +180,6 @@ def Li(u, delta, g, i):
     Li = 0.5 * a1 * (u ** 2) + (i * dx + a2 * delta) - a3 * g * u
     return Li
 
-
+# auction parameters
+reward_budget = 1.0
+num_winners = 5

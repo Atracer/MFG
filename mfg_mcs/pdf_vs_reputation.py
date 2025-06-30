@@ -9,9 +9,9 @@ from scipy.stats import gaussian_kde
 
 method_dirs = {
     "main": "results_b3_{b3}",
-    "stackelberg": "results_stackelberg_fpk_b3_{b3}_june_8",
+    "stackelberg": "results_stackelberg_fpk_revised_b3_{b3}_june_29",
     # "stk":"results_stackelberg_fpk_b3_{b3}",
-    "auction": "results_auction_fpk_b3_{b3}"
+    "auction": "results_auction_fpk_revised_b3_{b3}_june_29"
 }
 
 labels = {
@@ -73,7 +73,7 @@ for b3 in beta3_values:
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    out_name = f"compare_pdf_fpk_b3{b3}_d0{d0}_june_8.png"
+    out_name = f"compare_pdf_fpk_b3{b3}_d0{d0}_june_29.png"
     plt.savefig(out_name, dpi=300)
     print(f"[✓] Saved: {out_name}")
     plt.close()

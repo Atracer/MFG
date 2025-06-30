@@ -3,7 +3,7 @@ import numpy as np
 # avoid array index error & overflows
 # now we have dx directly
 class ReputationGrid:
-    def __init__(self, R=1.0, n=30):
+    def __init__(self, R=1.0, n=100):
         self.n = n
         self.R = R
         self.dx = R / n

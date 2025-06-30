@@ -2,10 +2,10 @@ import numpy as np
 import os
 import settings
 from grid_manager import ReputationGrid
-from FPK_Lax import FPK
+from fpk_lax_revised import FPK
 
 # 输出路径
-output_dir = "results_auction_fpk_b3_0.1"
+output_dir = "results_auction_fpk_revised_b3_0.1_june_29"
 os.makedirs(output_dir, exist_ok=True)
 
 # 网格与参数
@@ -33,59 +33,63 @@ collective_quality = np.zeros(T + 1)
 for k in range(pop):
     delta[k, :, 0] = settings.init_delta[k, :].copy()
 
-# 初始 reward 设置（Eq. 25 起始值）
-reward = settings.beta2 * d0
-dt = 1
+# initial reward + winners
+reward_budget = settings.reward_budget  
+num_winners = settings.num_winners 
+
+# === Cost function for auction ===
+def compute_cost(rep_idx):
+    rep = rep_idx * rep_grid.dx
+    return settings.beta2 * rep + settings.beta3 * (rep - settings.d0) ** 2
 
 # 主循环
 for t in range(T):
-    reward_seq[t] = reward
-    d_opt = (a3 / a1) * reward  # follower 最优努力
+    reward_seq[t] = reward_budget
+    bids = []
 
-    # 控制策略（soft sigmoid）
     for k in range(pop):
         for i in rep_grid.all_states():
-            delta_val = delta[k, i, t]
-            cost = -settings.Li(d_opt, delta_val, reward, i)
-            control[k, i, t] = 1.0 / (1.0 + np.exp(tau * cost))
+            cost = compute_cost(i)
+            bids.append((cost, k, i))
 
-    # 状态转移（FPK）
+    # Sort ascending: lower cost is better
+    bids.sort(key=lambda x: x[0])
+    winners = bids[:num_winners]
+    losers = bids[num_winners:]
+
     u_full = np.zeros((pop, rep_grid.size(), T + 1))
-    u_full[:, :, :t + 1] = control[:, :, :t + 1]
-    delta_new = FPK(u_full, reward, it=t)
+
+    for cost, k, i in winners:
+        # Winner: full control with tiny noise for numeric smoothness
+        u_full[k, i, t] = 1.0 + np.random.normal(0, 0.01)
+        control[k, i, t] = u_full[k, i, t]
+
+    for cost, k, i in losers:
+        # Loser: no control
+        u_full[k, i, t] = 0.0
+        control[k, i, t] = 0.0
+
+    # === Solve FPK with improved stabilizer ===
+    delta_new = FPK(u_full, reward_budget, it=t)
+    # [Stability] Clip negative, renormalize, optional smooth
+    for k in range(pop):
+        delta_new[k, :, t + 1] = np.maximum(delta_new[k, :, t + 1], 0)
+        sum_k = np.sum(delta_new[k, :, t + 1]) + 1e-8
+        delta_new[k, :, t + 1] /= sum_k
+
     delta[:, :, t + 1] = delta_new[:, :, t + 1]
 
-    # 聚合统计
-    total_rep = total_mass = total_quality = 0.0
+    # === Calculate avg reputation ===
+    total_rep, total_mass = 0.0, 0.0
     for k in range(pop):
         for i in rep_grid.all_states():
-            s = i * dx
+            s = i * rep_grid.dx
             prob = delta[k, i, t]
             total_rep += s * prob
             total_mass += prob
-            total_quality += control[k, i, t] * prob
 
-    R = total_rep / total_mass if total_mass > 0 else 0.0
-    D = total_quality
-    avg_reputation[t] = R
-    collective_quality[t] = D
+    avg_reputation[t] = total_rep / total_mass if total_mass > 0 else 0.0
 
-    # ★ 奖励更新：Eq. (25) 的优化梯度形式（非 Eq.6）
-    reward += dt * (omega2 * R - omega1 * D)
-    reward = max(0.0, reward)  # 非负限制
-
-# 最后一时刻统计更新
-reward_seq[T] = reward
-total_rep = total_mass = total_quality = 0.0
-for k in range(pop):
-    for i in rep_grid.all_states():
-        s = i * dx
-        prob = delta[k, i, T]
-        total_rep += s * prob
-        total_mass += prob
-        total_quality += control[k, i, T] * prob
-avg_reputation[T] = total_rep / total_mass if total_mass > 0 else 0.0
-collective_quality[T] = total_quality
 
 # 保存结果
 np.save(f"{output_dir}/control.npy", control)
